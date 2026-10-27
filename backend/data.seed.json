@@ -1,0 +1,307 @@
+{
+  "categorias": [
+    { "id": "hacienda", "nombre": "Catastro y Hacienda", "icono": "Landmark" },
+    { "id": "movilidad", "nombre": "Movilidad", "icono": "Car" },
+    { "id": "social", "nombre": "Inclusión Social y Educación", "icono": "GraduationCap" },
+    { "id": "salud", "nombre": "Salud y Bienestar", "icono": "HeartPulse" },
+    { "id": "planeacion", "nombre": "Planeación y Trámites Generales", "icono": "Building2" }
+  ],
+  "usuarios": [
+    {
+      "id": 1,
+      "nombre": "Juan Pérez",
+      "tipo_documento": "CC",
+      "documento": "1001234567",
+      "edad": 20,
+      "ocupacion": "Estudiante universitario",
+      "estrato": 2,
+      "sisben_grupo": "A1",
+      "regimen_salud": "SUBSIDIADO",
+      "comuna": "Comuna 3 - Manrique",
+      "barrio": "Manrique Oriental",
+      "direccion": "Calle 71 # 40-12",
+      "correo": "juan.perez@example.com",
+      "telefono": "300 123 4567",
+      "estudiante": true,
+      "pensionado": false,
+      "discapacidad": false,
+      "registro_mercantil": false,
+      "licencia_conduccion": null,
+      "predios": [],
+      "vehiculos": [],
+      "multas": [],
+      "tramites_recientes": [
+        { "radicado": "MED-2026-104233", "servicio_id": "SOC-01", "servicio_nombre": "Inscripción Becas Sapiencia", "fecha": "2026-08-14", "estado": "EN_REVISION" },
+        { "radicado": "MED-2026-087410", "servicio_id": "SAL-02", "servicio_nombre": "Solicitud de Encuesta / Actualización Sisbén IV", "fecha": "2026-05-02", "estado": "FINALIZADO" }
+      ]
+    },
+    {
+      "id": 2,
+      "nombre": "María Gómez",
+      "tipo_documento": "CC",
+      "documento": "43567890",
+      "edad": 45,
+      "ocupacion": "Administradora de empresas",
+      "estrato": 4,
+      "sisben_grupo": null,
+      "regimen_salud": "CONTRIBUTIVO",
+      "comuna": "Comuna 11 - Laureles-Estadio",
+      "barrio": "Laureles",
+      "direccion": "Circular 73 # 39-55, Apto 802",
+      "correo": "maria.gomez@example.com",
+      "telefono": "310 987 6543",
+      "estudiante": false,
+      "pensionado": false,
+      "discapacidad": false,
+      "registro_mercantil": false,
+      "licencia_conduccion": { "numero": "43567890", "categoria": "B1", "vigencia": "2031-03-15" },
+      "predios": [
+        { "matricula": "001-458712", "direccion": "Circular 73 # 39-55, Apto 802", "comuna": "Laureles-Estadio", "tipo": "Apartamento", "destino": "Residencial", "avaluo_catastral": 385000000, "vis": false, "predial_al_dia": true },
+        { "matricula": "001-662091", "direccion": "Carrera 76 # 32-18, Local 3", "comuna": "Belén", "tipo": "Local comercial", "destino": "Comercial", "avaluo_catastral": 210000000, "vis": false, "predial_al_dia": true }
+      ],
+      "vehiculos": [
+        { "placa": "HTK482", "tipo": "Automóvil", "marca": "Mazda 3", "modelo": 2021, "soat_vigente": true, "tecnomecanica_vigente": true }
+      ],
+      "multas": [
+        { "id": "FM-2026-55821", "tipo": "FOTOMULTA", "descripcion": "Exceso de velocidad (C29) – Av. Las Vegas con Calle 10", "valor": 580000, "fecha": "2026-09-03", "estado": "PENDIENTE" }
+      ],
+      "tramites_recientes": [
+        { "radicado": "MED-2026-012876", "servicio_id": "HAC-01", "servicio_nombre": "Pago de Impuesto Predial", "fecha": "2026-03-28", "estado": "FINALIZADO" }
+      ]
+    },
+    {
+      "id": 3,
+      "nombre": "Carlos Restrepo",
+      "tipo_documento": "CC",
+      "documento": "1037612345",
+      "edad": 32,
+      "ocupacion": "Emprendedor (Café de especialidad)",
+      "estrato": 3,
+      "sisben_grupo": null,
+      "regimen_salud": "CONTRIBUTIVO",
+      "comuna": "Comuna 16 - Belén",
+      "barrio": "La Mota",
+      "direccion": "Carrera 83 # 18A-40",
+      "correo": "carlos.restrepo@example.com",
+      "telefono": "315 456 7890",
+      "estudiante": false,
+      "pensionado": false,
+      "discapacidad": false,
+      "registro_mercantil": true,
+      "licencia_conduccion": { "numero": "1037612345", "categoria": "A2", "vigencia": "2030-07-01" },
+      "predios": [],
+      "vehiculos": [
+        { "placa": "XYZ12F", "tipo": "Motocicleta", "marca": "Yamaha FZ 2.0", "modelo": 2022, "soat_vigente": true, "tecnomecanica_vigente": true }
+      ],
+      "multas": [],
+      "tramites_recientes": [
+        { "radicado": "MED-2026-066102", "servicio_id": "PLA-01", "servicio_nombre": "Certificado de Uso de Suelo", "fecha": "2026-06-19", "estado": "FINALIZADO" }
+      ]
+    },
+    {
+      "id": 4,
+      "nombre": "Ana Jaramillo",
+      "tipo_documento": "CC",
+      "documento": "32145678",
+      "edad": 68,
+      "ocupacion": "Pensionada",
+      "estrato": 1,
+      "sisben_grupo": "B2",
+      "regimen_salud": "SUBSIDIADO",
+      "comuna": "Comuna 1 - Popular",
+      "barrio": "Santo Domingo Savio",
+      "direccion": "Calle 107 # 30-21",
+      "correo": "ana.jaramillo@example.com",
+      "telefono": "604 444 1234",
+      "estudiante": false,
+      "pensionado": true,
+      "discapacidad": false,
+      "registro_mercantil": false,
+      "licencia_conduccion": null,
+      "predios": [
+        { "matricula": "001-903344", "direccion": "Calle 107 # 30-21", "comuna": "Popular", "tipo": "Casa", "destino": "Residencial", "avaluo_catastral": 62000000, "vis": true, "predial_al_dia": true }
+      ],
+      "vehiculos": [],
+      "multas": [],
+      "tramites_recientes": [
+        { "radicado": "MED-2026-031557", "servicio_id": "SOC-02", "servicio_nombre": "Subsidio Adulto Mayor (Alcaldía)", "fecha": "2026-02-10", "estado": "APROBADO" }
+      ]
+    },
+    {
+      "id": 5,
+      "nombre": "Pedro Morales",
+      "tipo_documento": "CC",
+      "documento": "1036998877",
+      "edad": 28,
+      "ocupacion": "Profesional independiente (Ingeniero de software)",
+      "estrato": 5,
+      "sisben_grupo": null,
+      "regimen_salud": "CONTRIBUTIVO",
+      "comuna": "Comuna 14 - El Poblado",
+      "barrio": "Manila",
+      "direccion": "Calle 11 # 43B-50, Apto 501",
+      "correo": "pedro.morales@example.com",
+      "telefono": "318 222 3344",
+      "estudiante": false,
+      "pensionado": false,
+      "discapacidad": false,
+      "registro_mercantil": false,
+      "licencia_conduccion": { "numero": "1036998877", "categoria": "B1", "vigencia": "2034-11-20" },
+      "predios": [
+        { "matricula": "001-774512", "direccion": "Calle 11 # 43B-50, Apto 501", "comuna": "El Poblado", "tipo": "Apartamento", "destino": "Residencial", "avaluo_catastral": 520000000, "vis": false, "predial_al_dia": true }
+      ],
+      "vehiculos": [],
+      "multas": [
+        { "id": "CNV-2026-11930", "tipo": "CONVIVENCIA", "descripcion": "Comportamiento contrario a la convivencia – Ruido (Art. 33, Ley 1801 de 2016)", "valor": 240000, "fecha": "2026-07-22", "estado": "PENDIENTE" }
+      ],
+      "tramites_recientes": [
+        { "radicado": "MED-2026-090021", "servicio_id": "PLA-02", "servicio_nombre": "Radicación de PQRSD Ciudadano", "fecha": "2026-08-30", "estado": "RESPONDIDO" }
+      ]
+    }
+  ],
+  "servicios": [
+    {
+      "id": "HAC-01", "nombre": "Pago de Impuesto Predial", "categoria": "hacienda", "icono": "Receipt",
+      "descripcion": "Genere y pague la factura del impuesto predial unificado de sus predios.",
+      "entidad": "Secretaría de Hacienda", "tiempo_respuesta": "Inmediato", "costo": "Según avalúo",
+      "reglas": [{ "tipo": "min_predios", "valor": 1 }]
+    },
+    {
+      "id": "HAC-02", "nombre": "Certificado de Tradición Catastral", "categoria": "hacienda", "icono": "FileText",
+      "descripcion": "Certificado con la información física, jurídica y económica de su predio.",
+      "entidad": "Subsecretaría de Catastro", "tiempo_respuesta": "1 día hábil", "costo": "$ 18.500",
+      "reglas": [{ "tipo": "min_predios", "valor": 1 }]
+    },
+    {
+      "id": "HAC-03", "nombre": "Paz y Salvo Municipal", "categoria": "hacienda", "icono": "BadgeCheck",
+      "descripcion": "Constancia de que el predio y su titular están al día con las obligaciones del Municipio.",
+      "entidad": "Secretaría de Hacienda", "tiempo_respuesta": "Inmediato", "costo": "Gratuito",
+      "reglas": [
+        { "tipo": "min_predios", "valor": 1 },
+        { "tipo": "sin_multas_pendientes", "mensaje": "Debe estar al día con multas y comparendos para expedir el paz y salvo" }
+      ]
+    },
+    {
+      "id": "HAC-04", "nombre": "Solicitud de Revisión de Avalúo", "categoria": "hacienda", "icono": "Scale",
+      "descripcion": "Solicite la revisión del avalúo catastral si considera que no corresponde a su predio.",
+      "entidad": "Subsecretaría de Catastro", "tiempo_respuesta": "30 días hábiles", "costo": "Gratuito",
+      "reglas": [{ "tipo": "min_predios", "valor": 1 }]
+    },
+    {
+      "id": "MOV-01", "nombre": "Consulta y Pago de Fotomultas", "categoria": "movilidad", "icono": "Camera",
+      "descripcion": "Consulte las fotodetecciones asociadas a sus vehículos y realice el pago en línea.",
+      "entidad": "Secretaría de Movilidad", "tiempo_respuesta": "Inmediato", "costo": "Según infracción",
+      "reglas": [{ "tipo": "min_vehiculos", "valor": 1 }]
+    },
+    {
+      "id": "MOV-02", "nombre": "Permiso Especial de Pico y Placa Solidario", "categoria": "movilidad", "icono": "CalendarClock",
+      "descripcion": "Permiso para circular en horario de restricción mediante un aporte solidario.",
+      "entidad": "Secretaría de Movilidad", "tiempo_respuesta": "1 día hábil", "costo": "Según tarifa vigente",
+      "reglas": [
+        { "tipo": "min_vehiculos", "valor": 1 },
+        { "tipo": "sin_multas_pendientes", "valor": ["FOTOMULTA", "COMPARENDO_TRANSITO"], "mensaje": "Tiene comparendos de tránsito pendientes; debe estar a paz y salvo" }
+      ]
+    },
+    {
+      "id": "MOV-03", "nombre": "Duplicado de Licencia de Conducción", "categoria": "movilidad", "icono": "CreditCard",
+      "descripcion": "Solicite el duplicado de su licencia por pérdida, hurto o deterioro.",
+      "entidad": "Secretaría de Movilidad", "tiempo_respuesta": "3 días hábiles", "costo": "$ 61.900",
+      "reglas": [{ "tipo": "requiere_licencia" }]
+    },
+    {
+      "id": "MOV-04", "nombre": "Plan de Acuerdos de Pago por Comparendos", "categoria": "movilidad", "icono": "Handshake",
+      "descripcion": "Financie en cuotas el valor de sus comparendos de tránsito pendientes.",
+      "entidad": "Secretaría de Movilidad", "tiempo_respuesta": "5 días hábiles", "costo": "Gratuito",
+      "reglas": [{ "tipo": "con_multas_pendientes", "valor": ["FOTOMULTA", "COMPARENDO_TRANSITO"] }]
+    },
+    {
+      "id": "SOC-01", "nombre": "Inscripción Becas Sapiencia", "categoria": "social", "icono": "GraduationCap",
+      "descripcion": "Convocatoria de becas y créditos condonables para educación superior.",
+      "entidad": "Sapiencia", "tiempo_respuesta": "Según convocatoria", "costo": "Gratuito",
+      "reglas": [
+        { "tipo": "estratos", "valor": [1, 2, 3] },
+        { "tipo": "min_edad", "valor": 16 },
+        { "tipo": "max_edad", "valor": 35 }
+      ]
+    },
+    {
+      "id": "SOC-02", "nombre": "Subsidio Adulto Mayor (Alcaldía)", "categoria": "social", "icono": "HandHeart",
+      "descripcion": "Apoyo económico periódico para personas mayores en condición de vulnerabilidad.",
+      "entidad": "Secretaría de Inclusión Social", "tiempo_respuesta": "15 días hábiles", "costo": "Gratuito",
+      "reglas": [
+        { "tipo": "min_edad", "valor": 60, "mensaje": "Exclusivo para personas mayores de 60 años" },
+        { "tipo": "sisben_grupos", "valor": ["A", "B", "C"] }
+      ]
+    },
+    {
+      "id": "SOC-03", "nombre": "Subsidio Nutricional Sisbén (Grupos A y B)", "categoria": "social", "icono": "Apple",
+      "descripcion": "Complemento alimentario para hogares en pobreza extrema y moderada.",
+      "entidad": "Secretaría de Inclusión Social", "tiempo_respuesta": "10 días hábiles", "costo": "Gratuito",
+      "reglas": [{ "tipo": "sisben_grupos", "valor": ["A", "B"] }]
+    },
+    {
+      "id": "SOC-04", "nombre": "Tarifa Preferencial Metro Estudiantil", "categoria": "social", "icono": "TrainFront",
+      "descripcion": "Personalización de la tarjeta Cívica con tarifa diferencial para estudiantes.",
+      "entidad": "Secretaría de Educación", "tiempo_respuesta": "5 días hábiles", "costo": "Gratuito",
+      "reglas": [
+        { "tipo": "requiere_estudiante" },
+        { "tipo": "estratos", "valor": [1, 2, 3] }
+      ]
+    },
+    {
+      "id": "SAL-01", "nombre": "Agendamiento Citas Red MetroSalud", "categoria": "salud", "icono": "Stethoscope",
+      "descripcion": "Agende citas de medicina general, odontología y vacunación en la red pública.",
+      "entidad": "ESE Metrosalud", "tiempo_respuesta": "Inmediato", "costo": "Según régimen",
+      "reglas": [{ "tipo": "regimen_salud", "valor": ["SUBSIDIADO"], "mensaje": "Disponible para afiliados al régimen subsidiado (atendidos por la red pública)" }]
+    },
+    {
+      "id": "SAL-02", "nombre": "Solicitud de Encuesta / Actualización Sisbén IV", "categoria": "salud", "icono": "ClipboardList",
+      "descripcion": "Solicite la visita de encuesta o la actualización de los datos de su hogar.",
+      "entidad": "Departamento Administrativo de Planeación", "tiempo_respuesta": "20 días hábiles", "costo": "Gratuito",
+      "reglas": []
+    },
+    {
+      "id": "SAL-03", "nombre": "Jornada Gratuita de Esterilización Canina/Felina", "categoria": "salud", "icono": "PawPrint",
+      "descripcion": "Inscriba a su mascota en las jornadas gratuitas de esterilización.",
+      "entidad": "Secretaría de Salud – Bienestar Animal", "tiempo_respuesta": "Según jornada", "costo": "Gratuito",
+      "reglas": [{ "tipo": "estratos", "valor": [1, 2, 3] }]
+    },
+    {
+      "id": "SAL-04", "nombre": "Certificado de Discapacidad", "categoria": "salud", "icono": "Accessibility",
+      "descripcion": "Solicite la valoración para la certificación y el registro de localización (RLCPD).",
+      "entidad": "Secretaría de Salud", "tiempo_respuesta": "30 días hábiles", "costo": "Gratuito",
+      "reglas": []
+    },
+    {
+      "id": "PLA-01", "nombre": "Certificado de Uso de Suelo", "categoria": "planeacion", "icono": "Map",
+      "descripcion": "Conozca los usos permitidos para un predio según el POT (vivienda, comercio, industria).",
+      "entidad": "Departamento Administrativo de Planeación", "tiempo_respuesta": "15 días hábiles", "costo": "Gratuito",
+      "reglas": [
+        {
+          "tipo": "cualquiera",
+          "descripcion": "Ser propietario de un predio o tener registro mercantil",
+          "mensaje": "Requiere ser propietario de un predio o tener un negocio con registro mercantil",
+          "reglas": [{ "tipo": "min_predios", "valor": 1 }, { "tipo": "requiere_registro_mercantil" }]
+        }
+      ]
+    },
+    {
+      "id": "PLA-02", "nombre": "Radicación de PQRSD Ciudadano", "categoria": "planeacion", "icono": "MessageSquare",
+      "descripcion": "Peticiones, quejas, reclamos, sugerencias y denuncias ante la Alcaldía.",
+      "entidad": "Secretaría de Gestión Humana y Servicio a la Ciudadanía", "tiempo_respuesta": "15 días hábiles", "costo": "Gratuito",
+      "reglas": []
+    },
+    {
+      "id": "PLA-03", "nombre": "Certificado de Residencia / Vecindad", "categoria": "planeacion", "icono": "House",
+      "descripcion": "Certificado que acredita su residencia en el municipio de Medellín.",
+      "entidad": "Secretaría de Gobierno", "tiempo_respuesta": "3 días hábiles", "costo": "Gratuito",
+      "reglas": [{ "tipo": "min_edad", "valor": 18, "mensaje": "Requiere ser mayor de edad" }]
+    },
+    {
+      "id": "PLA-04", "nombre": "Reporte de Daños en Vía Pública (Huecos/Luminarias)", "categoria": "planeacion", "icono": "Construction",
+      "descripcion": "Reporte huecos, luminarias apagadas o daños en el espacio público.",
+      "entidad": "Secretaría de Infraestructura Física", "tiempo_respuesta": "10 días hábiles", "costo": "Gratuito",
+      "reglas": []
+    }
+  ]
+}
