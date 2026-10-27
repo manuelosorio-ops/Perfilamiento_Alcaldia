@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* Verde institucional */
+  --color-alcaldia-50: #eef8f1;
+  --color-alcaldia-100: #d4eedd;
+  --color-alcaldia-200: #a8dcbb;
+  --color-alcaldia-300: #6fc290;
+  --color-alcaldia-500: #1f9d55;
+  --color-alcaldia-600: #0b8040;
+  --color-alcaldia-700: #066b34;
+  --color-alcaldia-800: #07552b;
+  --color-alcaldia-900: #083f22;
+
+  /* Azul de apoyo */
+  --color-institucional-50: #eef5fc;
+  --color-institucional-600: #0b5ea8;
+  --color-institucional-700: #094c88;
+}
+
+body {
+  @apply bg-slate-50 text-slate-800 antialiased;
+}
+
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-alcaldia-500;
+}
