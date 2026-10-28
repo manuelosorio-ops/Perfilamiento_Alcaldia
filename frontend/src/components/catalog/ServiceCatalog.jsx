@@ -62,7 +62,7 @@ export default function ServiceCatalog({
         )}
       </div>
 
-      <MotorSelector motor={motor} onChange={onCambiarMotor} iaDisponible={iaDisponible} cargando={cargando} />
+      <MotorSelector motor={motor} onChange={onCambiarMotor} iaDisponible={iaDisponible} cargando={cargando} segmentos={segmentos} />
 
       {cargando && motor !== 'reglas' && (
         <p className="flex items-center gap-2 rounded-xl bg-institucional-50 p-3 text-sm font-medium text-institucional-700" role="status">
