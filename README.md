@@ -12,7 +12,25 @@ Además, un **motor de priorización** perfila al ciudadano por tipo de usuario 
 
 Requisitos: **Python 3.10+** y **Node.js 18+**.
 
-### Backend (terminal 1)
+### Opción rápida: un solo comando (macOS / Linux)
+
+```bash
+./dev.sh
+```
+
+El script:
+
+- Crea el entorno virtual e instala las dependencias de Python y de Node **solo si faltan o cambiaron**. La primera vez tarda unos segundos y después arranca casi al instante.
+- Levanta el backend (:8000) y el frontend (:5173) juntos, con los logs etiquetados como `[api]` y `[web]`.
+- Abre el navegador cuando los dos responden. Para no abrirlo, use `NO_ABRIR=1 ./dev.sh`.
+- Con **Ctrl+C** detiene los dos procesos. Si uno se cae, también detiene el otro.
+- Avisa si falta `backend/.env`, en cuyo caso la IA queda desactivada, y si los puertos ya están ocupados.
+
+> En Windows use WSL o la opción manual de abajo.
+
+### Opción manual: dos terminales
+
+#### Backend (terminal 1)
 
 ```bash
 cd backend
@@ -25,7 +43,7 @@ uvicorn main:app --reload --port 8000
 - API: http://localhost:8000
 - Documentación interactiva (Swagger): http://localhost:8000/docs
 
-### Frontend (terminal 2)
+#### Frontend (terminal 2)
 
 ```bash
 cd frontend
@@ -58,6 +76,7 @@ Si `backend/.env` tiene las variables `AZURE_OPENAI_*` (ver `backend/.env.exampl
 ```
 Perfilamiento_Alcaldia/
 ├── README.md
+├── dev.sh             # Levanta backend + frontend con un solo comando
 ├── .gitignore
 ├── backend/
 │   ├── main.py            # App FastAPI: CORS, endpoints REST
