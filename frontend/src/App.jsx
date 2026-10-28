@@ -29,7 +29,8 @@ export default function App() {
   const [usuarios, setUsuarios] = useState([])
   const [categorias, setCategorias] = useState([])
   const [usuarioId, setUsuarioId] = useState(() => Number(leer('usuarioActivo', 1)) || 1)
-  const [motor, setMotor] = useState(() => leer('motor', 'reglas'))
+  // Modo IA por defecto; si Azure no está configurado se cambia a 'reglas' al cargar.
+  const [motor, setMotor] = useState(() => leer('motorClasificacion', 'ia'))
   const [ciudadano, setCiudadano] = useState(null)
   const [recomendaciones, setRecomendaciones] = useState(null)
   const [clasificacion, setClasificacion] = useState(null)
@@ -38,6 +39,7 @@ export default function App() {
   const [cargandoCatalogo, setCargandoCatalogo] = useState(true)
   const [error, setError] = useState('')
   const [iaHabilitada, setIaHabilitada] = useState(false)
+  const [iaVerificada, setIaVerificada] = useState(false) // evita pedir modo IA antes de saber si hay Azure
   const [servicioEnCurso, setServicioEnCurso] = useState(null)
   const [toast, setToast] = useState(null)
   const peticionCatalogo = useRef(0)
@@ -50,6 +52,7 @@ export default function App() {
         setCategorias(c)
         setIaHabilitada(s.asistente_ia)
         if (!s.asistente_ia) setMotor('reglas')
+        setIaVerificada(true)
         if (!u.some((x) => x.id === usuarioId)) setUsuarioId(u[0]?.id)
       })
       .catch(() => setError('No se pudo conectar con el backend. ¿Está corriendo en http://localhost:8000?'))
@@ -92,10 +95,10 @@ export default function App() {
   }, [usuarioId, cargarPerfil])
 
   useEffect(() => {
-    if (!usuarioId) return
+    if (!usuarioId || !iaVerificada) return
     cargarCatalogo(usuarioId, motor)
-    guardar('motor', motor)
-  }, [usuarioId, motor, cargarCatalogo])
+    if (iaHabilitada) guardar('motorClasificacion', motor) // solo se recuerda una elección real del usuario
+  }, [usuarioId, motor, iaVerificada, iaHabilitada, cargarCatalogo])
 
   const alRadicar = (r) => {
     setToast({

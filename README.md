@@ -210,8 +210,8 @@ En el catálogo hay un selector **Motor de clasificación**:
 
 | Modo | Quién decide | Para qué sirve |
 |---|---|---|
-| **Reglas** | Python (`elegibilidad.py`) | Determinístico, auditable, sin costo. Es el modo por defecto. |
-| **IA** | GPT-4.1 | Ver cómo clasifica el modelo por sí solo, interpretando los requisitos en lenguaje natural. |
+| **Reglas** | Python (`elegibilidad.py`) | Determinístico, auditable, sin costo. Se usa automáticamente si la IA no está configurada o falla. |
+| **IA** | GPT-4.1 | **Modo por defecto.** El modelo clasifica interpretando los requisitos en lenguaje natural. |
 | **Híbrido** | Ambos | Producción: las reglas niegan con autoridad y la IA marca casos dudosos para revisión humana. |
 
 **Cómo funciona `clasificador_ia.py`:**
