@@ -3,16 +3,22 @@ import { AlertTriangle, Loader2, SearchX, Sparkles } from 'lucide-react'
 import MotorSelector from './MotorSelector'
 import ServiceCard from './ServiceCard'
 import ServiceFilters from './ServiceFilters'
+import SegmentChips from '../recommendations/SegmentChips'
 
-const FILTROS_INICIALES = { categoria: 'todas', estado: 'TODOS', busqueda: '' }
+const FILTROS_INICIALES = { categoria: 'todas', estado: 'TODOS', busqueda: '', orden: 'relevancia' }
+// Con IA o modo híbrido el estado final puede cambiar: se agrupa por estado y luego por prioridad.
+const GRUPO_ESTADO = { APTO: 0, REQUIERE_REVISION: 1, NO_APTO: 2 }
 
 /**
  * El backend devuelve el catálogo ya evaluado con el motor elegido
  * (GET /api/usuarios/{id}/clasificacion?motor=). Los filtros se aplican en cliente.
  */
-export default function ServiceCatalog({ clasificacion, categorias, ciudadano, motor, onCambiarMotor, iaDisponible, cargando, onIniciar }) {
+export default function ServiceCatalog({
+  clasificacion, categorias, ciudadano, segmentos, motor, onCambiarMotor, iaDisponible, cargando, onIniciar, onIrA,
+}) {
   const [filtros, setFiltros] = useState(FILTROS_INICIALES)
   const servicios = clasificacion.servicios
+  const hayPrioridad = servicios.some((s) => s.prioridad)
   const catPorId = useMemo(() => Object.fromEntries(categorias.map((c) => [c.id, c])), [categorias])
 
   const porCategoriaYTexto = useMemo(() => {
@@ -31,7 +37,15 @@ export default function ServiceCatalog({ clasificacion, categorias, ciudadano, m
     NO_APTO: contar('NO_APTO'),
     REQUIERE_REVISION: contar('REQUIERE_REVISION'),
   }
-  const visibles = porCategoriaYTexto.filter((s) => filtros.estado === 'TODOS' || s.estado === filtros.estado)
+  const filtrados = porCategoriaYTexto.filter((s) => filtros.estado === 'TODOS' || s.estado === filtros.estado)
+  const visibles =
+    filtros.orden === 'relevancia' && hayPrioridad
+      ? [...filtrados].sort(
+          (a, b) =>
+            GRUPO_ESTADO[a.estado] - GRUPO_ESTADO[b.estado] ||
+            (a.prioridad?.posicion ?? 999) - (b.prioridad?.posicion ?? 999),
+        )
+      : filtrados
   const aptos = servicios.filter((s) => s.estado === 'APTO').length
   const discrepancias = servicios.filter((s) => s.coincide === false)
 
@@ -43,6 +57,9 @@ export default function ServiceCatalog({ clasificacion, categorias, ciudadano, m
           Catálogo evaluado para <span className="font-semibold text-slate-700">{ciudadano.nombre}</span>: tiene{' '}
           <span className="font-semibold text-alcaldia-700">{aptos} de {servicios.length}</span> trámites disponibles según su perfil.
         </p>
+        {filtros.orden === 'relevancia' && hayPrioridad && (
+          <SegmentChips segmentos={segmentos} etiqueta="Ordenado según su perfil" className="mt-2" />
+        )}
       </div>
 
       <MotorSelector motor={motor} onChange={onCambiarMotor} iaDisponible={iaDisponible} cargando={cargando} />
@@ -74,7 +91,7 @@ export default function ServiceCatalog({ clasificacion, categorias, ciudadano, m
         </div>
       )}
 
-      <ServiceFilters categorias={categorias} filtros={filtros} onChange={setFiltros} conteos={conteos} />
+      <ServiceFilters categorias={categorias} filtros={filtros} onChange={setFiltros} conteos={conteos} ordenDisponible={hayPrioridad} />
 
       {visibles.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
@@ -87,7 +104,7 @@ export default function ServiceCatalog({ clasificacion, categorias, ciudadano, m
       ) : (
         <div className={`grid gap-4 transition-opacity sm:grid-cols-2 xl:grid-cols-3 ${cargando ? 'opacity-50' : ''}`}>
           {visibles.map((s) => (
-            <ServiceCard key={s.id} servicio={s} categoria={catPorId[s.categoria]} onIniciar={onIniciar} />
+            <ServiceCard key={s.id} servicio={s} categoria={catPorId[s.categoria]} onIniciar={onIniciar} onIrA={onIrA} />
           ))}
         </div>
       )}

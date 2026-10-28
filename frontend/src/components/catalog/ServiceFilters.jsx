@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react'
+import { ArrowUpDown, Search } from 'lucide-react'
 import Icon from '../ui/Icon'
 
 const ESTADOS = [
@@ -8,7 +8,7 @@ const ESTADOS = [
   { id: 'REQUIERE_REVISION', etiqueta: 'En revisión' },
 ]
 
-export default function ServiceFilters({ categorias, filtros, onChange, conteos }) {
+export default function ServiceFilters({ categorias, filtros, onChange, conteos, ordenDisponible = true }) {
   const set = (cambios) => onChange({ ...filtros, ...cambios })
   const chip = (activo) =>
     `inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold ring-1 transition ${
@@ -18,17 +18,33 @@ export default function ServiceFilters({ categorias, filtros, onChange, conteos 
   return (
     <div className="space-y-3">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <label className="relative block md:w-80">
-          <span className="sr-only">Buscar trámite</span>
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-          <input
-            type="search"
-            value={filtros.busqueda}
-            onChange={(e) => set({ busqueda: e.target.value })}
-            placeholder="Buscar trámite o entidad…"
-            className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-3 pl-9 text-sm placeholder:text-slate-400 focus:border-alcaldia-500 focus:outline-none"
-          />
-        </label>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <label className="relative block sm:w-72">
+            <span className="sr-only">Buscar trámite</span>
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+            <input
+              type="search"
+              value={filtros.busqueda}
+              onChange={(e) => set({ busqueda: e.target.value })}
+              placeholder="Buscar trámite o entidad…"
+              className="w-full rounded-xl border border-slate-200 bg-white py-2 pr-3 pl-9 text-sm placeholder:text-slate-400 focus:border-alcaldia-500 focus:outline-none"
+            />
+          </label>
+          {ordenDisponible && (
+            <label className="relative block">
+              <span className="sr-only">Ordenar trámites</span>
+              <ArrowUpDown className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+              <select
+                value={filtros.orden}
+                onChange={(e) => set({ orden: e.target.value })}
+                className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-2 pr-8 pl-9 text-sm font-medium text-slate-700 focus:border-alcaldia-500 focus:outline-none"
+              >
+                <option value="relevancia">Más relevantes para su perfil</option>
+                <option value="catalogo">Orden del catálogo</option>
+              </select>
+            </label>
+          )}
+        </div>
         <div className="inline-flex self-start rounded-xl bg-slate-100 p-1" role="group" aria-label="Filtrar por estado">
           {ESTADOS.filter((e) => e.id !== 'REQUIERE_REVISION' || conteos.REQUIERE_REVISION > 0).map((e) => (
             <button

@@ -5,6 +5,7 @@ Docs:      http://localhost:8000/docs
 """
 from __future__ import annotations
 
+import logging
 import random
 from datetime import date
 from typing import Optional
@@ -17,6 +18,7 @@ load_dotenv()  # carga backend/.env (credenciales opcionales de Azure OpenAI)
 
 import asistente  # noqa: E402
 import clasificador_ia  # noqa: E402
+import priorizacion  # noqa: E402
 from elegibilidad import evaluar_catalogo, evaluar_servicio  # noqa: E402
 from models import (  # noqa: E402
     Categoria,
@@ -24,6 +26,7 @@ from models import (  # noqa: E402
     Motor,
     EstadoServicio,
     Indicadores,
+    Recomendaciones,
     RespuestaAsistente,
     ServicioEvaluado,
     SolicitudAsistente,
@@ -34,6 +37,8 @@ from models import (  # noqa: E402
     UsuarioResumen,
 )
 from repositorio import repo  # noqa: E402
+
+log = logging.getLogger("portal")
 
 app = FastAPI(
     title="Portal Ciudadano – Alcaldía de Medellín (Prototipo)",
@@ -54,6 +59,16 @@ def _usuario_o_404(usuario_id: int) -> Usuario:
     if usuario is None:
         raise HTTPException(status_code=404, detail=f"Usuario {usuario_id} no encontrado")
     return usuario
+
+
+def _priorizar(usuario: Usuario, evaluados: list[ServicioEvaluado]) -> list[ServicioEvaluado]:
+    """Agrega la prioridad al catálogo. Si perfilamiento.json falla, el catálogo sigue
+    funcionando sin orden sugerido: la elegibilidad nunca depende de la priorización."""
+    try:
+        return priorizacion.priorizar(usuario, evaluados)[1]
+    except Exception as exc:  # archivo ausente, JSON inválido o regla desconocida
+        log.warning("Priorización no disponible: %s", exc)
+        return evaluados
 
 
 # ---------------------------------------------------------------------------
@@ -98,10 +113,10 @@ def servicios_del_usuario(
     estado: Optional[EstadoServicio] = Query(None, description="APTO o NO_APTO"),
 ):
     usuario = _usuario_o_404(usuario_id)
-    servicios = repo.listar_servicios()
+    # Se prioriza sobre el catálogo completo para que la posición no dependa del filtro.
+    evaluados = _priorizar(usuario, evaluar_catalogo(usuario, repo.listar_servicios()))
     if categoria:
-        servicios = [s for s in servicios if s.categoria == categoria]
-    evaluados = evaluar_catalogo(usuario, servicios)
+        evaluados = [s for s in evaluados if s.categoria == categoria]
     if estado:
         evaluados = [s for s in evaluados if s.estado == estado]
     return evaluados
@@ -111,7 +126,7 @@ def servicios_del_usuario(
 def clasificar_servicios(usuario_id: int, motor: Motor = Query(Motor.REGLAS, description="reglas | ia | hibrido")):
     """Catálogo evaluado con el motor elegido. Si la IA falla, se degrada a reglas e informa el error."""
     usuario = _usuario_o_404(usuario_id)
-    por_reglas = evaluar_catalogo(usuario, repo.listar_servicios())
+    por_reglas = _priorizar(usuario, evaluar_catalogo(usuario, repo.listar_servicios()))
 
     ia, ia_error = {}, None
     if motor != Motor.REGLAS:
@@ -130,6 +145,18 @@ def clasificar_servicios(usuario_id: int, motor: Motor = Query(Motor.REGLAS, des
         coincidencias=sum(bool(s.coincide) for s in servicios) if ia else None,
         servicios=servicios,
     )
+
+
+@app.get("/api/usuarios/{usuario_id}/recomendaciones", response_model=Recomendaciones, tags=["Catálogo"])
+def recomendaciones(usuario_id: int):
+    """Segmentos del ciudadano, trámites sugeridos (en orden), trámites que puede habilitar
+    y trámites que ya tiene en curso. Calculado con reglas: determinístico y explicable."""
+    usuario = _usuario_o_404(usuario_id)
+    evaluados = evaluar_catalogo(usuario, repo.listar_servicios())
+    try:
+        return priorizacion.recomendar(usuario, evaluados)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Error en perfilamiento.json: {exc}") from exc
 
 
 @app.post(

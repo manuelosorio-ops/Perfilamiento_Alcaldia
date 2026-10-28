@@ -31,6 +31,7 @@ export default function App() {
   const [usuarioId, setUsuarioId] = useState(() => Number(leer('usuarioActivo', 1)) || 1)
   const [motor, setMotor] = useState(() => leer('motor', 'reglas'))
   const [ciudadano, setCiudadano] = useState(null)
+  const [recomendaciones, setRecomendaciones] = useState(null)
   const [clasificacion, setClasificacion] = useState(null)
   const [vista, setVista] = useState('ficha')
   const [cargandoPerfil, setCargandoPerfil] = useState(true)
@@ -58,7 +59,10 @@ export default function App() {
   const cargarPerfil = useCallback(async (id) => {
     setCargandoPerfil(true)
     try {
-      setCiudadano(await api.usuario(id))
+      // Si la priorización falla, la ficha se muestra igual, sin el bloque de recomendaciones.
+      const [perfil, reco] = await Promise.all([api.usuario(id), api.recomendaciones(id).catch(() => null)])
+      setCiudadano(perfil)
+      setRecomendaciones(reco)
       setError('')
     } catch (e) {
       setError(e.message)
@@ -99,7 +103,15 @@ export default function App() {
       titulo: `${r.estado === 'EN_REVISION' ? 'Radicado para revisión' : 'Trámite radicado'}: ${r.radicado}`,
       mensaje: r.servicio_nombre,
     })
+    // El nuevo trámite queda "en curso": cambian las sugerencias y el orden del catálogo.
     cargarPerfil(usuarioId)
+    cargarCatalogo(usuarioId, motor)
+  }
+
+  // Desde una sugerencia ("Puede habilitar") se abre directamente el trámite que ayuda.
+  const irATramite = (servicioId) => {
+    const s = clasificacion?.servicios.find((x) => x.id === servicioId)
+    if (s) setServicioEnCurso(s)
   }
 
   const restablecer = async () => {
@@ -126,18 +138,27 @@ export default function App() {
           <div className="grid place-items-center py-24 text-slate-400"><Loader2 className="size-8 animate-spin" aria-label="Cargando" /></div>
         ) : vista === 'ficha' ? (
           <div className={`transition-opacity ${cargandoPerfil ? 'opacity-50' : ''}`} aria-busy={cargandoPerfil}>
-            <CitizenProfile ciudadano={ciudadano} onVerTramites={() => setVista('tramites')} />
+            <CitizenProfile
+              ciudadano={ciudadano}
+              recomendaciones={recomendaciones}
+              categorias={categorias}
+              onVerTramites={() => setVista('tramites')}
+              onIniciar={setServicioEnCurso}
+              onIrA={irATramite}
+            />
           </div>
         ) : (
           <ServiceCatalog
             clasificacion={clasificacion}
             categorias={categorias}
             ciudadano={ciudadano}
+            segmentos={recomendaciones?.segmentos}
             motor={motor}
             onCambiarMotor={setMotor}
             iaDisponible={iaHabilitada}
             cargando={cargandoCatalogo}
             onIniciar={setServicioEnCurso}
+            onIrA={irATramite}
           />
         )}
       </main>

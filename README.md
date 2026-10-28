@@ -2,6 +2,8 @@
 
 Prototipo de portal de trámites con **control de acceso basado en atributos (ABAC)**: cada uno de los 20 servicios declara sus reglas en `data.json` y el backend evalúa, para el ciudadano activo, si es **APTO** o **NO_APTO** con un `motivo_rechazo` legible.
 
+Además, un **motor de priorización** perfila al ciudadano por tipo de usuario (estudiante, persona mayor, propietario, conductor…) y decide **qué mostrarle primero y qué sugerirle**, con una razón explicable para cada sugerencia (sección 8).
+
 **Stack:** FastAPI + Pydantic v2 · React 18 (Vite) + Tailwind CSS v4 + Lucide React · `data.json` como base de datos simulada · (opcional) asistente IA con Azure OpenAI.
 
 ---
@@ -61,6 +63,8 @@ Perfilamiento_Alcaldia/
 │   ├── main.py            # App FastAPI: CORS, endpoints REST
 │   ├── models.py          # Modelos Pydantic (dominio + respuestas)
 │   ├── elegibilidad.py    # Motor ABAC: evaluadores por tipo de regla
+│   ├── priorizacion.py    # Perfilamiento + orden sugerido + recomendaciones
+│   ├── perfilamiento.json # Segmentos, pesos e impulsos de la priorización
 │   ├── repositorio.py     # Persistencia JSON (lectura por petición, escritura atómica)
 │   ├── asistente.py       # Cliente Azure OpenAI + chat del asistente
 │   ├── clasificador_ia.py # Clasificación con GPT-4.1 y combinación híbrida
@@ -82,6 +86,7 @@ Perfilamiento_Alcaldia/
             ├── profile/  CitizenProfile      (Vista 1: Ficha integral)
             ├── catalog/  ServiceCatalog, ServiceFilters, ServiceCard,
             │             StartServiceModal   (Vista 2: Catálogo)
+            ├── recommendations/ Recommendations, SegmentChips (sugerencias por perfil)
             ├── assistant/AssistantPanel      (chat IA opcional)
             └── ui/       Badge, Icon, Toast
 ```
@@ -131,6 +136,8 @@ Perfilamiento_Alcaldia/
 | `con_multas_pendientes` | tipos de multa | "No registra comparendos de tránsito pendientes…" |
 | `requiere_estudiante`, `requiere_licencia`, `requiere_registro_mercantil`, `requiere_discapacidad` | — | "Exclusivo para estudiantes con matrícula vigente" |
 | `cualquiera` | sub-`reglas` (OR lógico) | "Requiere ser propietario de un predio o tener registro mercantil" |
+| `predial_pendiente` | — | Se cumple si algún predio tiene el predial atrasado (usado en la priorización) |
+| `sin_sisben` | — | Se cumple si no tiene clasificación Sisbén (usado en la priorización) |
 
 Cualquier regla acepta `mensaje` y `descripcion` para personalizar los textos. Para añadir un tipo nuevo, registre una función en `EVALUADORES` (`elegibilidad.py`).
 
@@ -143,7 +150,8 @@ Cualquier regla acepta `mensaje` y `descripcion` para personalizar los textos. P
 | GET | `/api/usuarios` | Lista resumida de los 5 ciudadanos de prueba |
 | GET | `/api/usuarios/{id}` | Perfil completo + `indicadores` (multas, predios, servicios aptos…) |
 | GET | `/api/usuarios/{id}/servicios?categoria=&estado=` | Catálogo evaluado solo con reglas (`estado`, `motivo_rechazo`, `requisitos[]`) |
-| GET | `/api/usuarios/{id}/clasificacion?motor=reglas\|ia\|hibrido` | Catálogo evaluado con el motor elegido + comparación reglas vs. IA |
+| GET | `/api/usuarios/{id}/clasificacion?motor=reglas\|ia\|hibrido` | Catálogo evaluado con el motor elegido + comparación reglas vs. IA (incluye `prioridad`) |
+| GET | `/api/usuarios/{id}/recomendaciones` | Segmentos del ciudadano, trámites recomendados en orden, desbloqueables y en seguimiento |
 | POST | `/api/usuarios/{id}/servicios/{servicio_id}/iniciar?motor=` | Re-valida con reglas y radica (201) o rechaza (403); con IA en desacuerdo queda `EN_REVISION` |
 | GET | `/api/categorias` | Categorías del catálogo |
 | POST | `/api/usuarios/{id}/asistente` | Chat IA (503 si no está configurado) |
@@ -226,3 +234,52 @@ En el catálogo hay un selector **Motor de clasificación**:
 - El endpoint `…/iniciar` **siempre** valida con reglas. Aunque en modo IA el modelo marque "apto", si las reglas no lo permiten responde 403.
 - Si Azure falla (red, cuota, credenciales o JSON inválido), el catálogo **se degrada a reglas** y muestra un aviso con el error.
 - Cada tarjeta muestra la decisión de la IA, su confianza y si coincide con las reglas. El encabezado resume cuántas coincidencias hubo, por ejemplo *"coincide en 18 de 20"*.
+
+---
+
+## 8. Perfilamiento y priorización: qué mostrar primero
+
+Además de decidir APTO / NO_APTO, el backend ordena el catálogo y arma sugerencias para cada ciudadano. Lo hace `priorizacion.py` con la configuración de `perfilamiento.json`. **No usa IA**: es determinístico, auditable y cada punto del puntaje tiene una razón visible. Tampoco habilita nada, porque solo ordena lo que las reglas ya decidieron.
+
+**1. Tipo de usuario (segmentos).** Cada segmento se define con reglas del mismo motor ABAC, y un ciudadano puede pertenecer a varios:
+
+| Segmento | Regla | Le interesa sobre todo |
+|---|---|---|
+| Estudiante | `requiere_estudiante` | Metro Estudiantil, Becas Sapiencia |
+| Joven | 14 a 28 años | Becas Sapiencia |
+| Persona mayor | 60 años o más | Subsidio Adulto Mayor, MetroSalud |
+| Prioridad social | Sisbén A o B | Subsidio Nutricional, MetroSalud |
+| Propietario(a) | al menos 1 predio | Predial, certificados y avalúo |
+| Conductor(a) | vehículo **o** licencia | Pico y Placa Solidario |
+| Emprendedor(a) | registro mercantil | Uso de Suelo |
+| Persona con discapacidad | `requiere_discapacidad` | Certificado de Discapacidad |
+
+**2. Puntaje por trámite.** Es la suma de razones:
+
+| Razón | Ejemplo | Puntos |
+|---|---|---|
+| Tipo de trámite | beneficio / obligación / trámite / general | 30 / 15 / 10 / 0 |
+| Impulsos por situación | fotomulta pendiente → Fotomultas; sin Sisbén y estrato 1-3 → Encuesta Sisbén | +40 a +100 (los urgentes se marcan **Prioritario**) |
+| Intereses del segmento | estudiante → Metro Estudiantil | +5 a +50 |
+| Especificidad | por cada requisito del trámite (lo dirigido va antes que lo genérico) | +4 c/u |
+| Historial | realizado en los últimos 365 días | −50 |
+
+Los trámites **en curso** (radicado, en revisión) o **vigentes** (aprobado) no se vuelven a sugerir. Se muestran como "en seguimiento".
+
+**3. Recomendados.** Son los mejores trámites APTO con al menos 25 puntos, hasta 4, y como máximo 2 por categoría para que haya variedad.
+
+**4. Desbloqueables.** Son trámites NO_APTO cuyo impedimento puede resolver el ciudadano. Por ejemplo, "pague su fotomulta y se le habilita el Paz y Salvo", o "haga la encuesta Sisbén y podría acceder al Subsidio Nutricional". Cada uno incluye el paso a seguir y un enlace al trámite que lo resuelve.
+
+**Resultado con los datos de prueba:**
+
+| Ciudadano | Perfil | Recomendados (en orden) | Puede habilitar |
+|---|---|---|---|
+| Juan | Estudiante · Joven · Prioridad social | Metro Estudiantil, Subsidio Nutricional, MetroSalud | — (Becas Sapiencia: en curso) |
+| María | Propietaria · Conductora | **Fotomultas**, **Acuerdo de pago**, Certificado Catastral, Revisión de Avalúo | Pico y Placa Solidario, Paz y Salvo |
+| Carlos | Conductor · Emprendedor | Encuesta Sisbén, Pico y Placa Solidario, Becas Sapiencia | Subsidio Nutricional |
+| Ana | Persona mayor · Prioridad social · Propietaria | Subsidio Nutricional, MetroSalud, Predial, Paz y Salvo | — (Subsidio Adulto Mayor: vigente) |
+| Pedro | Joven · Propietario · Conductor | Predial, Certificado Catastral | Paz y Salvo |
+
+**En la interfaz:** la ficha muestra el bloque *Recomendados para usted*. El catálogo se ordena por relevancia, con un selector para volver al orden original. Cada tarjeta muestra la razón de la sugerencia y un desglose del puntaje en *Prioridad para su perfil*.
+
+**Ajustes:** edite `backend/perfilamiento.json` (segmentos, intereses, impulsos, pesos, límites). Se relee en cada petición, así que no hace falta reiniciar. Si el archivo tiene un error, el catálogo sigue funcionando sin orden sugerido y `/recomendaciones` responde 500 con el detalle.

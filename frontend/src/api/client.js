@@ -35,6 +35,8 @@ export const api = {
     const q = qs.toString()
     return request(`/api/usuarios/${id}/servicios${q ? `?${q}` : ''}`)
   },
+  // Segmentos del ciudadano + trámites sugeridos, desbloqueables y en seguimiento.
+  recomendaciones: (id) => request(`/api/usuarios/${id}/recomendaciones`),
   // motor: 'reglas' | 'ia' | 'hibrido'
   clasificacion: (id, motor = 'reglas') => request(`/api/usuarios/${id}/clasificacion?motor=${motor}`),
   iniciarTramite: (usuarioId, servicioId, motor = 'reglas') =>

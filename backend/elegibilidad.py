@@ -95,6 +95,16 @@ def _con_multas_pendientes(u: Usuario, r: Regla) -> Resultado:
             "No registra comparendos de tránsito pendientes para acordar un plan de pago")
 
 
+def _predial_pendiente(u: Usuario, r: Regla) -> Resultado:
+    return (any(not p.predial_al_dia for p in u.predios), "Tener impuesto predial pendiente",
+            "Tiene el impuesto predial al día")
+
+
+def _sin_sisben(u: Usuario, r: Regla) -> Resultado:
+    return (not u.sisben_grupo, "No tener clasificación Sisbén",
+            f"Ya cuenta con clasificación Sisbén ({u.sisben_grupo})")
+
+
 def _requiere_estudiante(u: Usuario, r: Regla) -> Resultado:
     return (u.estudiante, "Ser estudiante activo", "Exclusivo para estudiantes con matrícula vigente")
 
@@ -132,6 +142,8 @@ EVALUADORES: dict[str, Callable[[Usuario, Regla], Resultado]] = {
     "min_vehiculos": _min_vehiculos,
     "sin_multas_pendientes": _sin_multas_pendientes,
     "con_multas_pendientes": _con_multas_pendientes,
+    "predial_pendiente": _predial_pendiente,
+    "sin_sisben": _sin_sisben,
     "requiere_estudiante": _requiere_estudiante,
     "requiere_licencia": _requiere_licencia,
     "requiere_registro_mercantil": _requiere_registro_mercantil,

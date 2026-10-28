@@ -171,6 +171,52 @@ class RequisitoEvaluado(BaseModel):
     mensaje: Optional[str] = None
 
 
+# ---------------------------------------------------------------------------
+# Perfilamiento y priorización (ver priorizacion.py y perfilamiento.json)
+# ---------------------------------------------------------------------------
+TipoServicio = Literal["obligacion", "beneficio", "tramite", "general"]
+
+
+class Razon(BaseModel):
+    """Un aporte al puntaje de un servicio. La suma de los puntos es el puntaje."""
+
+    tipo: Literal["tipo", "impulso", "segmento", "especificidad", "historial"]
+    texto: str
+    puntos: int
+
+
+class HistorialServicio(BaseModel):
+    situacion: Literal["EN_CURSO", "VIGENTE", "RECIENTE"]
+    radicado: str
+    estado: str
+    fecha: str
+
+
+class PasoDesbloqueo(BaseModel):
+    texto: str                              # qué debe hacer el ciudadano
+    detalle: Optional[str] = None           # el motivo de rechazo que resuelve
+    servicio_id: Optional[str] = None       # trámite apto que le ayuda a resolverlo
+    servicio_nombre: Optional[str] = None
+
+
+class Prioridad(BaseModel):
+    puntaje: int
+    posicion: int = 0                       # 1 = lo primero que se le muestra
+    recomendado: bool = False
+    urgente: bool = False
+    razon_principal: Optional[str] = None
+    razones: list[Razon] = []
+    historial: Optional[HistorialServicio] = None
+    desbloqueo: Optional[list[PasoDesbloqueo]] = None  # solo en NO_APTO resolubles
+
+
+class Segmento(BaseModel):
+    id: str
+    nombre: str
+    icono: str
+    descripcion: str
+
+
 class ServicioEvaluado(BaseModel):
     id: str
     nombre: str
@@ -187,6 +233,73 @@ class ServicioEvaluado(BaseModel):
     estado_reglas: Optional[EstadoServicio] = None
     evaluacion_ia: Optional[EvaluacionIA] = None
     coincide: Optional[bool] = None
+    # Priorización según el perfil (None si perfilamiento.json no está disponible)
+    prioridad: Optional[Prioridad] = None
+
+
+class Recomendaciones(BaseModel):
+    segmentos: list[Segmento]
+    recomendados: list[ServicioEvaluado]      # lo que se le sugiere primero
+    desbloqueables: list[ServicioEvaluado]    # NO_APTO que puede habilitar resolviendo algo
+    en_seguimiento: list[ServicioEvaluado]    # aptos que ya tiene en curso o vigentes
+
+
+# -- Configuración (perfilamiento.json) --------------------------------------
+class SegmentoConfig(Segmento):
+    reglas: list[Regla]                       # quién pertenece (AND; use "cualquiera" para OR)
+    razon: str                                # texto de la sugerencia, p. ej. "Por ser estudiante"
+    intereses: dict[str, int] = {}            # servicio_id -> puntos
+
+
+class Impulso(BaseModel):
+    reglas: list[Regla]
+    puntos: int
+    razon: str
+    urgente: bool = False
+
+
+class ServicioPrioridadConfig(BaseModel):
+    tipo: TipoServicio = "tramite"
+    impulsos: list[Impulso] = []
+
+
+class TipoConfig(BaseModel):
+    puntos: int
+    razon: str
+
+
+class AccionDesbloqueo(BaseModel):
+    texto: str
+    servicios: list[str] = []                 # trámites que ayudan a resolverlo (se usa el primero apto)
+    solo_si: list[Regla] = []                 # condiciones para que la sugerencia tenga sentido
+
+
+class PesosConfig(BaseModel):
+    por_requisito: int = 4
+    realizado_reciente: int = -50
+    ventana_reciente_dias: int = 365
+
+
+class RecomendadosConfig(BaseModel):
+    limite: int = 4
+    puntaje_minimo: int = 25
+    max_por_categoria: int = 2
+
+
+class HistorialConfig(BaseModel):
+    en_curso: list[str] = ["RADICADO", "EN_REVISION"]
+    vigente: list[str] = ["APROBADO"]
+    finalizado: list[str] = ["FINALIZADO", "RESPONDIDO"]
+
+
+class ConfigPerfilamiento(BaseModel):
+    tipos: dict[TipoServicio, TipoConfig]
+    pesos: PesosConfig = PesosConfig()
+    recomendados: RecomendadosConfig = RecomendadosConfig()
+    historial: HistorialConfig = HistorialConfig()
+    segmentos: list[SegmentoConfig] = []
+    servicios: dict[str, ServicioPrioridadConfig] = {}
+    acciones: dict[str, AccionDesbloqueo] = {}
 
 
 class Clasificacion(BaseModel):

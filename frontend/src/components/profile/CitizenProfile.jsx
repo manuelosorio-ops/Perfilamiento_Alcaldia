@@ -1,10 +1,11 @@
 import {
-  AlertTriangle, ArrowRight, Bike, Briefcase, Car, CheckCircle2, CreditCard, GraduationCap, HeartPulse,
+  AlertTriangle, ArrowRight, Bike, Briefcase, Car, CheckCircle2, CreditCard, HeartPulse,
   Home, Mail, MapPin, Phone, ShieldCheck, Store, UserRound,
 } from 'lucide-react'
 import { formatoCOP } from '../../api/client'
 import { Avatar } from '../layout/UserSwitcher'
 import Badge, { EstadoTramite } from '../ui/Badge'
+import Recommendations from '../recommendations/Recommendations'
 
 function Tarjeta({ titulo, icono: Icono, accion, children, className = '' }) {
   return (
@@ -32,7 +33,7 @@ function Dato({ etiqueta, valor, nota }) {
 
 const Vacio = ({ children }) => <p className="rounded-xl border border-dashed border-slate-200 p-4 text-sm text-slate-500">{children}</p>
 
-export default function CitizenProfile({ ciudadano: c, onVerTramites }) {
+export default function CitizenProfile({ ciudadano: c, recomendaciones, categorias, onVerTramites, onIniciar, onIrA }) {
   const ind = c.indicadores
   const etiquetas = [
     ind.adulto_mayor && ['Adulto mayor', 'azul'],
@@ -44,7 +45,7 @@ export default function CitizenProfile({ ciudadano: c, onVerTramites }) {
   const porcentaje = Math.round((ind.servicios_aptos / ind.servicios_total) * 100)
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Identificación */}
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-3">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
@@ -72,6 +73,9 @@ export default function CitizenProfile({ ciudadano: c, onVerTramites }) {
           </ul>
         </div>
       </section>
+
+      {/* Recomendaciones según el perfil (priorizacion.py) */}
+      <Recommendations datos={recomendaciones} categorias={categorias} onIniciar={onIniciar} onIrA={onIrA} />
 
       {/* Resumen socioeconómico */}
       <Tarjeta titulo="Resumen socioeconómico" icono={UserRound} className="lg:col-span-2">
@@ -202,11 +206,6 @@ export default function CitizenProfile({ ciudadano: c, onVerTramites }) {
         )}
       </Tarjeta>
 
-      {c.estudiante && (
-        <p className="flex items-center gap-2 text-sm text-slate-500 lg:col-span-3">
-          <GraduationCap className="size-4" aria-hidden="true" /> Perfil estudiantil activo: consulte los beneficios de Sapiencia y tarifa Metro.
-        </p>
-      )}
     </div>
   )
 }

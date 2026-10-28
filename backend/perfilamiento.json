@@ -1,0 +1,161 @@
+{
+  "tipos": {
+    "obligacion": { "puntos": 15, "razon": "Obligación asociada a su perfil" },
+    "beneficio": { "puntos": 30, "razon": "Beneficio al que tiene derecho" },
+    "tramite": { "puntos": 10, "razon": "Trámite disponible para su perfil" },
+    "general": { "puntos": 0, "razon": "Abierto a toda la ciudadanía" }
+  },
+
+  "pesos": {
+    "por_requisito": 4,
+    "realizado_reciente": -50,
+    "ventana_reciente_dias": 365
+  },
+
+  "recomendados": {
+    "limite": 4,
+    "puntaje_minimo": 25,
+    "max_por_categoria": 2
+  },
+
+  "historial": {
+    "en_curso": ["RADICADO", "EN_REVISION"],
+    "vigente": ["APROBADO"],
+    "finalizado": ["FINALIZADO", "RESPONDIDO"]
+  },
+
+  "segmentos": [
+    {
+      "id": "estudiante",
+      "nombre": "Estudiante",
+      "icono": "GraduationCap",
+      "descripcion": "Tiene matrícula académica vigente",
+      "reglas": [{ "tipo": "requiere_estudiante" }],
+      "razon": "Por ser estudiante",
+      "intereses": { "SOC-04": 40, "SOC-01": 35 }
+    },
+    {
+      "id": "joven",
+      "nombre": "Joven",
+      "icono": "Users",
+      "descripcion": "Entre 14 y 28 años (Estatuto de Ciudadanía Juvenil)",
+      "reglas": [{ "tipo": "min_edad", "valor": 14 }, { "tipo": "max_edad", "valor": 28 }],
+      "razon": "Por ser joven",
+      "intereses": { "SOC-01": 20 }
+    },
+    {
+      "id": "adulto_mayor",
+      "nombre": "Persona mayor",
+      "icono": "HandHeart",
+      "descripcion": "60 años o más",
+      "reglas": [{ "tipo": "min_edad", "valor": 60 }],
+      "razon": "Por ser persona mayor",
+      "intereses": { "SOC-02": 50, "SAL-01": 30, "SOC-03": 15 }
+    },
+    {
+      "id": "proteccion_social",
+      "nombre": "Prioridad social",
+      "icono": "HeartHandshake",
+      "descripcion": "Clasificación Sisbén grupo A o B",
+      "reglas": [{ "tipo": "sisben_grupos", "valor": ["A", "B"] }],
+      "razon": "Por su clasificación Sisbén",
+      "intereses": { "SOC-03": 40, "SAL-01": 25, "SOC-02": 20, "SAL-03": 10 }
+    },
+    {
+      "id": "propietario",
+      "nombre": "Propietario(a)",
+      "icono": "House",
+      "descripcion": "Tiene predios a su nombre",
+      "reglas": [{ "tipo": "min_predios", "valor": 1 }],
+      "razon": "Por tener predios a su nombre",
+      "intereses": { "HAC-01": 30, "HAC-02": 15, "HAC-03": 15, "HAC-04": 15, "PLA-01": 10 }
+    },
+    {
+      "id": "conductor",
+      "nombre": "Conductor(a)",
+      "icono": "Car",
+      "descripcion": "Tiene vehículo o licencia de conducción",
+      "reglas": [
+        {
+          "tipo": "cualquiera",
+          "reglas": [{ "tipo": "min_vehiculos", "valor": 1 }, { "tipo": "requiere_licencia" }]
+        }
+      ],
+      "razon": "Por tener vehículo o licencia de conducción",
+      "intereses": { "MOV-02": 25, "MOV-01": 5, "MOV-03": 5 }
+    },
+    {
+      "id": "emprendedor",
+      "nombre": "Emprendedor(a)",
+      "icono": "Store",
+      "descripcion": "Tiene un negocio con registro mercantil",
+      "reglas": [{ "tipo": "requiere_registro_mercantil" }],
+      "razon": "Por tener un negocio registrado",
+      "intereses": { "PLA-01": 35, "HAC-03": 10 }
+    },
+    {
+      "id": "discapacidad",
+      "nombre": "Persona con discapacidad",
+      "icono": "Accessibility",
+      "descripcion": "Discapacidad certificada",
+      "reglas": [{ "tipo": "requiere_discapacidad" }],
+      "razon": "Por su condición de discapacidad",
+      "intereses": { "SAL-04": 40, "SAL-01": 15 }
+    }
+  ],
+
+  "servicios": {
+    "HAC-01": {
+      "tipo": "obligacion",
+      "impulsos": [
+        { "reglas": [{ "tipo": "predial_pendiente" }], "puntos": 100, "urgente": true, "razon": "Tiene impuesto predial pendiente de pago" }
+      ]
+    },
+    "HAC-02": { "tipo": "tramite" },
+    "HAC-03": { "tipo": "tramite" },
+    "HAC-04": { "tipo": "tramite" },
+    "MOV-01": {
+      "tipo": "obligacion",
+      "impulsos": [
+        { "reglas": [{ "tipo": "con_multas_pendientes", "valor": ["FOTOMULTA"] }], "puntos": 100, "urgente": true, "razon": "Tiene fotomultas pendientes de pago" }
+      ]
+    },
+    "MOV-02": { "tipo": "tramite" },
+    "MOV-03": { "tipo": "tramite" },
+    "MOV-04": {
+      "tipo": "obligacion",
+      "impulsos": [
+        { "reglas": [{ "tipo": "con_multas_pendientes", "valor": ["FOTOMULTA", "COMPARENDO_TRANSITO"] }], "puntos": 80, "urgente": true, "razon": "Puede pagar en cuotas sus multas de tránsito pendientes" }
+      ]
+    },
+    "SOC-01": { "tipo": "beneficio" },
+    "SOC-02": { "tipo": "beneficio" },
+    "SOC-03": { "tipo": "beneficio" },
+    "SOC-04": { "tipo": "beneficio" },
+    "SAL-01": { "tipo": "tramite" },
+    "SAL-02": {
+      "tipo": "tramite",
+      "impulsos": [
+        { "reglas": [{ "tipo": "sin_sisben" }, { "tipo": "estratos", "valor": [1, 2, 3] }], "puntos": 40, "razon": "No tiene clasificación Sisbén: la encuesta le abre la puerta a programas sociales" }
+      ]
+    },
+    "SAL-03": { "tipo": "tramite" },
+    "SAL-04": { "tipo": "tramite" },
+    "PLA-01": { "tipo": "tramite" },
+    "PLA-02": { "tipo": "general" },
+    "PLA-03": { "tipo": "tramite" },
+    "PLA-04": { "tipo": "general" }
+  },
+
+  "acciones": {
+    "sin_multas_pendientes": {
+      "texto": "Póngase al día con sus multas pendientes",
+      "servicios": ["MOV-01", "MOV-04"]
+    },
+    "sisben_grupos": {
+      "texto": "Solicite la encuesta Sisbén IV",
+      "servicios": ["SAL-02"],
+      "solo_si": [{ "tipo": "sin_sisben" }, { "tipo": "estratos", "valor": [1, 2, 3] }]
+    }
+  }
+}
